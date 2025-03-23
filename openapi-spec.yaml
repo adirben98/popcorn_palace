@@ -1,0 +1,604 @@
+openapi: 3.0.0
+info:
+  title: Popcorn Palace API
+  description: API for managing movie information
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: Movies
+    description: Operations related to movie management
+  - name: Showtimes
+    description: Operations related to movie showtimes
+  - name: Bookings
+    description: Operations related to booking a ticket
+    
+paths:
+  /movies/all:
+    get:
+      tags:
+        - Movies
+      summary: Get all movies
+      description: Retrieve a list of all movies
+      operationId: findAllMovies
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+              example:
+                - id: 12345
+                  title: "Sample Movie Title 1"
+                  genre: "Action"
+                  duration: 120
+                  rating: 8.7
+                  releaseYear: 2025
+                - id: 67890
+                  title: "Sample Movie Title 2"
+                  genre: "Comedy"
+                  duration: 90
+                  rating: 7.5
+                  releaseYear: 2024
+  /movies:
+    post:
+      tags:
+        - Movies
+      summary: Add a movie
+      description: Add a new movie to the database
+      operationId: addMovie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMovieDto'
+            example:
+              title: "Sample Movie Title"
+              genre: "Action"
+              duration: 120
+              rating: 8.7
+              releaseYear: 2025
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+              example:
+                id: 1
+                title: "Sample Movie Title"
+                genre: "Action"
+                duration: 120
+                rating: 8.7
+                releaseYear: 2025
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                message: ["title must be a string"]
+                error: "Bad Request"
+                statusCode: 400
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              example:
+                message: "There is already a movie with the title Sample Movie Title"
+                statusCode: 409
+  /movies/update/{movieTitle}:
+    post:
+      tags:
+        - Movies
+      summary: Update a movie
+      description: Update an existing movie by title
+      operationId: updateMovie
+      parameters:
+        - name: movieTitle
+          in: path
+          required: true
+          description: Title of the movie to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMovieDto'
+            example:
+              title: "Sample Movie Title"
+              genre: "Action"
+              duration: 120
+              rating: 8.7
+              releaseYear: 2025
+      responses:
+        '201':
+          description: Updated
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                message: "No data provided to update"
+                statusCode: 400
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              example:
+                message: "There is no movie with title: Sample Movie Title"
+                statusCode: 404
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              example:
+                message: "There is already a movie with the title Sample Movie Title"
+                statusCode: 409
+  /movies/{movieTitle}:
+    delete:
+      tags:
+        - Movies
+      summary: Delete a movie
+      description: Delete a movie by title
+      operationId: deleteMovie
+      parameters:
+        - name: movieTitle
+          in: path
+          required: true
+          description: Title of the movie to delete
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              example:
+                message: "There is no movie with title: Sample Movie Title"
+                statusCode: 404
+                
+  
+  /showtimes/{showtimeId}:
+    get:
+      tags:
+        - Showtimes
+      summary: Get showtime by ID
+      description: Retrieve showtime information by ID
+      operationId: getShowtimeByID
+      parameters:
+        - name: showtimeId
+          in: path
+          required: true
+          description: ID of the showtime to retrieve
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Showtime'
+              example:
+                id: 1
+                theater: "Sample Theater"
+                start_time: "2025-02-14T11:47:46.125405Z"
+                end_time: "2025-02-14T14:47:46.125405Z"
+                price: 50.20
+                movie:
+                  id: 1
+                  title: "Sample Movie Title"
+                  genre: "Action"
+                  duration: 120
+                  rating: 8.7
+                  releaseYear: 2025
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              example:
+                message: "There is no showtime with id: 1"
+                statusCode: 404
+    delete:
+      tags:
+        - Showtimes
+      summary: Delete a showtime
+      description: Delete a showtime by ID
+      operationId: deleteShowtime
+      parameters:
+        - name: showtimeId
+          in: path
+          required: true
+          description: ID of the showtime to delete
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              example:
+                message: "There is no showtime with id: 1"
+                statusCode: 404
+    
+  
+  /showtimes:
+    post:
+      tags:
+        - Showtimes
+      summary: Add a showtime
+      description: Add a new showtime to the database
+      operationId: addShowtime
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateShowtimeDto'
+            example:
+              theater: "Sample Theater"
+              start_time: "2025-02-14T11:47:46.125405Z"
+              end_time: "2025-02-14T14:47:46.125405Z"
+              price: 20.20
+              movieId: 1
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Showtime'
+              example:
+                id: 1
+                theater: "Sample Theater"
+                start_time: "2025-02-14T11:47:46.125405Z"
+                end_time: "2025-02-14T14:47:46.125405Z"
+                price: 20.20
+                movie:
+                  id: 1
+                  title: "Sample Movie Title"
+                  genre: "Action"
+                  duration: 120
+                  rating: 8.7
+                  releaseYear: 2025
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              example:
+                message: "Movie does not exist"
+                statusCode: 404
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              example:
+                message: "This show is overlapping with another show!"
+                statusCode: 409
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                message: ["theater must be a string", "start_time must be a valid ISO 8601 date string"]
+                error: "Bad Request"
+                statusCode: 400
+                
+  /showtimes/update/{showtimeId}:
+    post:
+      tags:
+        - Showtimes
+      summary: Update a showtime
+      description: Update an existing showtime by ID
+      operationId: updateShowtime
+      parameters:
+        - name: showtimeId
+          in: path
+          required: true
+          description: ID of the showtime to update
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateShowtimeDto'
+            example:
+              theater: "Sample Theater"
+              start_time: "2025-02-14T11:47:46.125405Z"
+              end_time: "2025-02-14T14:47:46.125405Z"
+              price: 50.20
+              movieId: 1
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                message: ["theater must be a string", "start_time must be a valid ISO 8601 date string"]
+                error: "Bad Request"
+                statusCode: 400
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              example:
+                message: "There is no showtime with id: 1"
+                statusCode: 404
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              example:
+                message: "This show is overlapping with another show!"
+                statusCode: 409
+                
+  /bookings:
+    post:
+      tags:
+        - Bookings
+      summary: Book a ticket
+      description: Book a ticket for a specific showtime
+      operationId: bookTicket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingDto'
+            example:
+              showtimeId: 1
+              seatNumber: 15
+              userId: "84438967-f68f-4fa0-b620-0f08217e76af"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+              example:
+                bookingId: "d1a6423b-4469-4b00-8c5f-e3cfc42eacae"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                message: ["showtimeId must be an integer", "seatNumber must be an integer", "userId must be a string"]
+                error: "Bad Request"
+                statusCode: 400
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              example:
+                message: "Showtime does not exist"
+                statusCode: 404
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              example:
+                message: "This seat is already taken"
+                statusCode: 409
+    
+                
+components:
+  schemas:
+    Movie:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the movie
+        title:
+          type: string
+          description: Movie title
+        genre:
+          type: string
+          description: Movie genre
+        duration:
+          type: integer
+          description: Movie duration in minutes
+        rating:
+          type: number
+          format: float
+          description: Movie rating
+        releaseYear:
+          type: integer
+          description: Year the movie was released
+      required:
+        - title
+        - genre
+        - duration
+        - rating
+        - releaseYear
+    CreateMovieDto:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Movie title
+        genre:
+          type: string
+          description: Movie genre
+        duration:
+          type: integer
+          description: Movie duration in minutes
+        rating:
+          type: number
+          format: float
+          description: Movie rating
+        releaseYear:
+          type: integer
+          description: Year the movie was released
+      required:
+        - title
+        - genre
+        - duration
+        - rating
+        - releaseYear
+    UpdateMovieDto:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Movie title
+        genre:
+          type: string
+          description: Movie genre
+        duration:
+          type: integer
+          description: Movie duration in minutes
+        rating:
+          type: number
+          format: float
+          description: Movie rating
+        releaseYear:
+          type: integer
+          description: Year the movie was released
+        
+    
+    Showtime:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the showtime
+        theater:
+          type: string
+          description: Theater name
+        start_time:
+          type: string
+          format: date-time
+          description: Start time of the show
+        end_time:
+          type: string
+          format: date-time
+          description: End time of the show
+        price:
+          type: number
+          format: float
+          description: Ticket price
+        movie:
+          $ref: '#/components/schemas/Movie'
+          description: Movie associated with this showtime
+      required:
+        - theater
+        - start_time
+        - end_time
+        - price
+        - movie
+        
+    CreateShowtimeDto:
+      type: object
+      properties:
+        theater:
+          type: string
+          description: Theater name
+        start_time:
+          type: string
+          format: date-time
+          description: Start time of the show
+        end_time:
+          type: string
+          format: date-time
+          description: End time of the show
+        price:
+          type: number
+          format: float
+          description: Ticket price
+        movieId:
+          type: integer
+          description: ID of the movie associated with this showtime
+      required:
+        - theater
+        - start_time
+        - end_time
+        - price
+        - movieId
+        
+    UpdateShowtimeDto:
+      type: object
+      properties:
+        theater:
+          type: string
+          description: Theater name
+        start_time:
+          type: string
+          format: date-time
+          description: Start time of the show
+        end_time:
+          type: string
+          format: date-time
+          description: End time of the show
+        price:
+          type: number
+          format: float
+          description: Ticket price
+        movieId:
+          type: integer
+          description: ID of the movie associated with this showtime
+          
+    Booking:
+      type: object
+      properties:
+        bookingId:
+          type: string
+          format: uuid
+          description: Unique identifier for the booking
+        showtime:
+          $ref: '#/components/schemas/Showtime'
+          description: Showtime associated with this booking
+        seatNumber:
+          type: integer
+          description: Seat number
+        userId:
+          type: string
+          description: ID of the user making the booking
+      required:
+        - bookingId
+        - showtime
+        - seatNumber
+        - userId
+        
+    CreateBookingDto:
+      type: object
+      properties:
+        showtimeId:
+          type: integer
+          description: ID of the showtime
+        seatNumber:
+          type: integer
+          description: Seat number
+        userId:
+          type: string
+          description: ID of the user making the booking
+      required:
+        - showtimeId
+        - seatNumber
+        - userId
+        
+    BookingResponse:
+      type: object
+      properties:
+        bookingId:
+          type: string
+          format: uuid
+          description: Unique identifier for the booking
+      required:
+        - bookingId
