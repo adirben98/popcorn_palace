@@ -18,6 +18,23 @@ The system is built using NestJS, leveraging its robust framework for creating R
 
 ## APIs
 
+
+### Swagger API Documentation
+
+The project includes a Swagger YAML template that describes the API endpoints.
+
+To view and interact with the API documentation:
+
+   1. Copy the contents of the openapi-spec.yaml file in the project root.
+   2. Visit the Swagger Editor at https://editor.swagger.io/ or any other Swagger UI tool.
+   3. Paste the copied YAML content into the editor.
+
+This will render an interactive API documentation interface where you can:
+
+   - Explore all available endpoints
+   - View request/response models
+   - Test API calls directly from the interface
+
 ### Movies  APIs
 
 | API Description           | Endpoint               | Request Body                          | Response Status | Response Body |
